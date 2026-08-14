@@ -1,12 +1,8 @@
 let name = "Tanmoy"
 let age = 23
 
-fn greet(name) {
-    return "Hello, " + name
-}
-
 if age >= 18 {
-    greet(name)
+    print("Hello, " + name)
 } else {
     print("Too young")
 }
