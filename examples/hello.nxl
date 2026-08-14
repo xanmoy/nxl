@@ -1,0 +1,8 @@
+let name = "Tanmoy"
+let age = 23
+
+print(name)
+print(age)
+print("Hello, NXL")
+print(true)
+print(null)
