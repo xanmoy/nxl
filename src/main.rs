@@ -1,6 +1,7 @@
 mod ast;
 mod environment;
 mod error;
+mod interpreter;
 mod lexer;
 mod parser;
 mod runtime;
@@ -9,6 +10,7 @@ mod token;
 use std::env;
 use std::fs;
 
+use interpreter::Interpreter;
 use lexer::Lexer;
 use parser::Parser;
 
@@ -26,12 +28,19 @@ fn main() {
         Ok(source) => source,
 
         Err(error) => {
-            eprintln!("NXL ERROR: could not read '{}': {}", filename, error);
+            eprintln!(
+                "NXL ERROR: could not read '{}': {}",
+                filename,
+                error
+            );
             std::process::exit(1);
         }
     };
 
+    // ---------------------------------------------------------
     // Lexer
+    // ---------------------------------------------------------
+
     let mut lexer = Lexer::new(&source);
 
     let tokens = match lexer.tokenize() {
@@ -43,17 +52,29 @@ fn main() {
         }
     };
 
+    // ---------------------------------------------------------
     // Parser
+    // ---------------------------------------------------------
+
     let mut parser = Parser::new(tokens);
 
-    match parser.parse() {
-        Ok(ast) => {
-            println!("{ast:#?}");
-        }
+    let ast = match parser.parse() {
+        Ok(ast) => ast,
 
         Err(error) => {
             eprintln!("NXL PARSER ERROR: {error}");
             std::process::exit(1);
         }
+    };
+
+    // ---------------------------------------------------------
+    // Interpreter
+    // ---------------------------------------------------------
+
+    let mut interpreter = Interpreter::new();
+
+    if let Err(error) = interpreter.interpret(&ast) {
+        eprintln!("NXL RUNTIME ERROR: {error}");
+        std::process::exit(1);
     }
 }
